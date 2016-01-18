@@ -7,6 +7,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.mazouri.greendao.db.DbUtil;
+import com.mazouri.greendao.db.services.NoteService;
+
 import java.util.Date;
 
 import mazouri.greendao.gen.DaoMaster;
@@ -23,6 +26,8 @@ public class MainActivity extends ActionBarActivity {
     private DaoSession daoSession;
     private NoteDao noteDao;
 
+    private NoteService noteService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +38,7 @@ public class MainActivity extends ActionBarActivity {
 
     private void testGreenDao() {
 
+        //方式1 基本使用
         devOpenHelper = new DaoMaster.DevOpenHelper(this, "notes-db", null);
         db = devOpenHelper.getWritableDatabase();
         daoMaster = new DaoMaster(db);
@@ -46,6 +52,23 @@ public class MainActivity extends ActionBarActivity {
         noteDao.insert(note);
         Log.d(TAG, "Inserted new note, ID : " + note.getId());
         Log.d(TAG, "Inserted new note, text : " + note.getText());
+
+
+        //推荐 方式2
+        String noteText2 = "this is noteText2";
+        String comment2 = "this is note comment2";
+
+        noteService = DbUtil.getNoteService();
+        Note note2 = new Note(null, noteText2, comment2, new Date());
+        noteService.save(note2);
+
+        Log.d(TAG, "Inserted new note, ID : " + note2.getId());
+        Log.d(TAG, "Inserted new note, text : " + note2.getText());
+
+        note2.setText("change note text");
+        noteService.saveOrUpdate(note2);
+
+
     }
 
     @Override
